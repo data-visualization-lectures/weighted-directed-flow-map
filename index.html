@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>重み付き有向フローマップ | Weighted Directed Flow Map</title>
+  <meta name="description" content="向きのある重み付きネットワーク（A→B と B→A で値が異なるフロー）を地図上に描くツール">
+  <script>
+  (function () {
+    if (new URLSearchParams(location.search).get('embed') === '1') return;
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('Failed to load: ' + src));
+        document.head.appendChild(s);
+      });
+    }
+    (async () => {
+      try {
+        await loadScript('https://id.data-viz-lectures.com/lib/supabase.v1.js');
+        await loadScript('https://id.data-viz-lectures.com/lib/dataviz-auth-client.v1.js');
+        await loadScript('https://id.data-viz-lectures.com/lib/dataviz-tool-header.v1.js');
+        await loadScript('https://id.data-viz-lectures.com/lib/dataviz-sample-picker.v1.js');
+      } catch (err) {
+        console.error('[weighted-directed-flow-map] shared libs load failed:', err);
+      }
+    })();
+  })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script src="vendor/topojson-client.min.js"></script>
+  <script>
+  (function () {
+    [
+      ['https://id.data-viz-lectures.com/lib/dvz-editor-shell.v1.css', 'lib/dvz-editor-shell.v1.css'],
+      ['https://id.data-viz-lectures.com/lib/dvz-setting-sidebar.v1.css', 'lib/dvz-setting-sidebar.v1.css'],
+    ].forEach(([href, fallback]) => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      link.onerror = () => {
+        const local = document.createElement('link');
+        local.rel = 'stylesheet';
+        local.href = fallback;
+        document.head.insertBefore(local, document.querySelector('link[href^="css/dvz-common.css"]'));
+      };
+      document.head.appendChild(link);
+    });
+  })();
+  </script>
+  <noscript>
+    <link rel="stylesheet" href="lib/dvz-editor-shell.v1.css">
+    <link rel="stylesheet" href="lib/dvz-setting-sidebar.v1.css">
+  </noscript>
+  <link rel="stylesheet" href="css/dvz-common.css?v=1">
+  <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+  <dataviz-tool-header></dataviz-tool-header>
+
+  <div class="dvz-app" data-dvz-view="chart">
+    <div id="main-area">
+      <main id="dvz-chart">
+        <h2 id="chart-title"></h2>
+        <div id="chart-area">
+          <div id="chart-container">
+            <div class="empty-state" data-i18n="emptyState">エッジリスト（出発・到着・値）または OD 行列を読み込んでください</div>
+          </div>
+        </div>
+        <div id="dvz-controls"></div>
+        <div id="chart-source"></div>
+      </main>
+
+      <footer id="dvz-site-links">
+        <a href="https://www.dataviz.jp/" target="_blank" rel="noopener">dataviz.jp</a>
+      </footer>
+    </div>
+
+    <aside id="dvz-sidebar" class="dvz-setting-sidebar" data-dvz-setting-sidebar data-i18n-aria="sidebarLabel" aria-label="チャート設定">
+      <div class="sidebar-tab-select-wrap dvz-setting-sidebar__select-wrap">
+        <select id="sidebar-tab-select" data-dvz-setting-tab-select data-i18n-aria="tabSelect" aria-label="タブを選択">
+          <option value="tab-data" selected data-i18n="tabData">データ</option>
+          <option value="tab-mapping" data-i18n="tabMapping">マッピング</option>
+          <option value="tab-style" data-i18n="tabStyle">スタイル</option>
+          <option value="tab-annotate" data-i18n="tabAnnotate">注釈</option>
+          <option value="tab-export" data-i18n="tabExport">出力</option>
+        </select>
+      </div>
+      <div class="sidebar-tabs dvz-setting-sidebar__tabs" data-dvz-setting-tabs>
+        <button type="button" class="sidebar-tab is-active" data-dvz-setting-tab data-tab="tab-data" data-i18n="tabData">データ</button>
+        <button type="button" class="sidebar-tab" data-dvz-setting-tab data-tab="tab-mapping" data-i18n="tabMapping">マッピング</button>
+        <button type="button" class="sidebar-tab" data-dvz-setting-tab data-tab="tab-style" data-i18n="tabStyle">スタイル</button>
+        <button type="button" class="sidebar-tab" data-dvz-setting-tab data-tab="tab-annotate" data-i18n="tabAnnotate">注釈</button>
+        <button type="button" class="sidebar-tab" data-dvz-setting-tab data-tab="tab-export" data-i18n="tabExport">出力</button>
+      </div>
+
+      <div class="sidebar-panels dvz-setting-sidebar__panels" data-dvz-setting-panels>
+        <!-- Data: COMMON_TAB_VISUAL_CONTRACT -->
+        <section id="tab-data" class="sidebar-panel dvz-setting-sidebar__panel common-data-tab" data-dvz-setting-panel>
+          <div class="panel-section common-tab-section">
+            <h3 class="common-panel-heading" data-i18n="upload">アップロード</h3>
+            <div id="dvz-dropzone" class="dropzone" role="button" tabindex="0">
+              <svg class="dropzone-icon" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 8.25 12 3.75m0 0L7.5 8.25M12 3.75V15"></path>
+              </svg>
+              <span class="dropzone-primary" data-i18n="dropPrimary">CSV / TSV / JSON をドロップ</span>
+              <span class="dropzone-secondary" data-i18n="dropSecondary">またはクリックして選択</span>
+            </div>
+            <input id="dvz-file-input" type="file" accept=".csv,.tsv,.txt,.json,text/csv,text/tab-separated-values,application/json" hidden>
+          </div>
+          <div class="panel-section common-tab-section">
+            <h3 class="common-panel-heading" data-i18n="loadedData">読込済みデータ</h3>
+            <div id="data-summary" class="summary-list"></div>
+          </div>
+          <div class="panel-section common-tab-section">
+            <h3 class="common-panel-heading" data-i18n="dataPreview">データプレビュー（先頭5行）</h3>
+            <div id="data-preview" class="data-preview"></div>
+          </div>
+        </section>
+
+        <section id="tab-mapping" class="sidebar-panel dvz-setting-sidebar__panel hidden" data-dvz-setting-panel>
+          <div class="panel-section">
+            <label for="map-input-format" class="panel-label" data-i18n="mapInputFormat">データ形式</label>
+            <select id="map-input-format" data-setting="inputFormat">
+              <option value="auto" data-i18n="formatAuto">自動判定</option>
+              <option value="edge-list" data-i18n="formatEdgeList">エッジリスト（出発・到着・値）</option>
+              <option value="od-matrix" data-i18n="formatMatrix">OD 行列（行＝出発、列＝到着）</option>
+            </select>
+            <p id="map-format-note" class="panel-note"></p>
+          </div>
+          <div class="panel-section" data-format="edge-list">
+            <label for="map-from" class="panel-label" data-i18n="mapFrom">出発地</label>
+            <select id="map-from" data-setting="fromColumn" data-columns></select>
+            <label for="map-to" class="panel-label panel-label--spaced" data-i18n="mapTo">到着地</label>
+            <select id="map-to" data-setting="toColumn" data-columns></select>
+            <label for="map-value" class="panel-label panel-label--spaced" data-i18n="mapValue">値（太さ）</label>
+            <select id="map-value" data-setting="valueColumn" data-columns data-allow-count></select>
+            <label for="map-group" class="panel-label panel-label--spaced" data-i18n="mapGroup">分類・期間（任意）</label>
+            <select id="map-group" data-setting="groupColumn" data-columns data-allow-none></select>
+          </div>
+          <div class="panel-section" data-format="edge-list">
+            <h3 class="panel-heading" data-i18n="mapCoords">緯度経度列（任意）</h3>
+            <div class="coord-grid">
+              <label for="map-from-lat" class="panel-label" data-i18n="mapFromLat">出発 緯度</label>
+              <select id="map-from-lat" data-setting="fromLatColumn" data-columns data-allow-none></select>
+              <label for="map-from-lon" class="panel-label" data-i18n="mapFromLon">出発 経度</label>
+              <select id="map-from-lon" data-setting="fromLonColumn" data-columns data-allow-none></select>
+              <label for="map-to-lat" class="panel-label" data-i18n="mapToLat">到着 緯度</label>
+              <select id="map-to-lat" data-setting="toLatColumn" data-columns data-allow-none></select>
+              <label for="map-to-lon" class="panel-label" data-i18n="mapToLon">到着 経度</label>
+              <select id="map-to-lon" data-setting="toLonColumn" data-columns data-allow-none></select>
+            </div>
+          </div>
+          <div class="panel-section" data-format="od-matrix">
+            <label for="map-matrix-label" class="panel-label" data-i18n="mapMatrixLabel">行ラベルの列</label>
+            <select id="map-matrix-label" data-setting="matrixLabelColumn" data-columns></select>
+            <label for="map-matrix-orientation" class="panel-label panel-label--spaced" data-i18n="mapOrientation">向き</label>
+            <select id="map-matrix-orientation" data-setting="matrixOrientation">
+              <option value="rows-origin" data-i18n="orientRowsOrigin">行＝出発、列＝到着</option>
+              <option value="cols-origin" data-i18n="orientColsOrigin">列＝出発、行＝到着</option>
+            </select>
+          </div>
+          <div class="panel-section">
+            <label class="check-row"><input id="map-exclude-totals" type="checkbox" data-setting="excludeTotals"><span data-i18n="mapExcludeTotals">合計の行・列を除外</span></label>
+          </div>
+          <div class="panel-section">
+            <label for="map-gazetteer" class="panel-label" data-i18n="mapGazetteer">地点の照合</label>
+            <select id="map-gazetteer" data-setting="gazetteer">
+              <option value="auto" data-i18n="gazAuto">自動</option>
+              <option value="jp-prefectures" data-i18n="gazJp">日本の都道府県</option>
+              <option value="world-countries" data-i18n="gazCountries">世界の国・地域</option>
+              <option value="world-cities" data-i18n="gazCities">世界の主要都市・日本の市</option>
+              <option value="coordinates" data-i18n="gazCoords">緯度経度列のみ</option>
+            </select>
+          </div>
+          <div class="panel-section">
+            <h3 class="panel-heading" data-i18n="matchReport">地点の照合結果</h3>
+            <div id="match-report" class="match-report"></div>
+          </div>
+        </section>
+
+        <section id="tab-style" class="sidebar-panel dvz-setting-sidebar__panel hidden" data-dvz-setting-panel>
+          <div class="panel-section">
+            <label for="style-basemap" class="panel-label" data-i18n="styleBasemap">基図</label>
+            <select id="style-basemap" data-setting="basemap">
+              <option value="auto" data-i18n="basemapAuto">自動</option>
+              <option value="world" data-i18n="basemapWorld">世界</option>
+              <option value="japan" data-i18n="basemapJapan">日本（都道府県）</option>
+              <option value="none" data-i18n="basemapNone">なし</option>
+            </select>
+            <label for="style-projection" class="panel-label panel-label--spaced" data-i18n="styleProjection">投影法</label>
+            <select id="style-projection" data-setting="projection">
+              <option value="auto" data-i18n="projAuto">自動</option>
+              <option value="natural-earth">Natural Earth</option>
+              <option value="equal-earth">Equal Earth</option>
+              <option value="mercator" data-i18n="projMercator">メルカトル</option>
+              <option value="conic-conformal" data-i18n="projConic">正角円錐</option>
+            </select>
+            <div data-basemap-only="world">
+              <label for="style-center-mode" class="panel-label panel-label--spaced" data-i18n="styleCenter">中心経度</label>
+              <div class="inline-row">
+                <select id="style-center-mode" data-setting="centerLongitudeMode">
+                  <option value="auto" data-i18n="centerAuto">データから自動</option>
+                  <option value="manual" data-i18n="centerManual">指定</option>
+                </select>
+                <input id="style-center" type="number" min="-180" max="180" step="5" data-setting="centerLongitude" aria-label="中心経度" data-i18n-aria="styleCenter">
+              </div>
+              <p id="style-longway-note" class="panel-note"></p>
+            </div>
+            <label for="style-extent" class="panel-label panel-label--spaced" data-i18n="styleExtent">表示範囲</label>
+            <select id="style-extent" data-setting="extent">
+              <option value="nodes" data-i18n="extentNodes">地点に合わせる</option>
+              <option value="basemap" data-i18n="extentBasemap">基図全体</option>
+            </select>
+            <label class="check-row" data-basemap-only="japan"><input id="style-okinawa" type="checkbox" data-setting="okinawaInset"><span data-i18n="styleOkinawa">沖縄を左上に移す（枠付き）</span></label>
+          </div>
+          <div class="panel-section">
+            <label for="style-shape" class="panel-label" data-i18n="styleShape">向きの表現</label>
+            <select id="style-shape" data-setting="flowShape">
+              <option value="arrow" data-i18n="shapeArrow">均一幅＋矢尻</option>
+              <option value="tapered" data-i18n="shapeTapered">先細り</option>
+              <option value="tapered-arrow" data-i18n="shapeTaperedArrow">先細り＋矢尻</option>
+              <option value="tapered-centerline" data-i18n="shapeTaperedCenter">先細り＋中央矢印線</option>
+            </select>
+            <label for="style-curvature" class="panel-label panel-label--spaced" data-i18n="styleCurvature">曲がり具合</label>
+            <div class="range-row"><input id="style-curvature" type="range" min="0" max="0.6" step="0.02" data-setting="curvature"><output data-for="style-curvature"></output></div>
+            <label for="style-max-width" class="panel-label panel-label--spaced" data-i18n="styleMaxWidth">最大の太さ（px）</label>
+            <div class="range-row"><input id="style-max-width" type="range" min="1" max="60" step="1" data-setting="maxWidth"><output data-for="style-max-width"></output></div>
+            <label for="style-min-width" class="panel-label panel-label--spaced" data-i18n="styleMinWidth">最小の太さ（px）</label>
+            <div class="range-row"><input id="style-min-width" type="range" min="0" max="10" step="0.25" data-setting="minWidth"><output data-for="style-min-width"></output></div>
+            <label for="style-width-scale" class="panel-label panel-label--spaced" data-i18n="styleWidthScale">太さの尺度</label>
+            <select id="style-width-scale" data-setting="widthScale">
+              <option value="linear" data-i18n="scaleLinear">比例</option>
+              <option value="sqrt" data-i18n="scaleSqrt">平方根</option>
+            </select>
+          </div>
+          <div class="panel-section">
+            <label for="style-top-n" class="panel-label" data-i18n="styleTopN">表示件数（上位）</label>
+            <input id="style-top-n" type="number" min="1" max="10000" step="1" data-setting="topN">
+            <label class="check-row"><input id="style-keep-pairs" type="checkbox" data-setting="keepPairs"><span data-i18n="styleKeepPairs">往復はまとめて残す</span></label>
+            <label for="style-min-value" class="panel-label panel-label--spaced" data-i18n="styleMinValue">最小値</label>
+            <input id="style-min-value" type="number" min="0" step="any" data-setting="minValue">
+            <p id="style-hidden-note" class="panel-note"></p>
+          </div>
+          <div class="panel-section">
+            <label for="style-color-mode" class="panel-label" data-i18n="styleColorMode">フローの色</label>
+            <select id="style-color-mode" data-setting="colorMode">
+              <option value="single" data-i18n="colorSingle">単色</option>
+              <option value="value" data-i18n="colorValue">値の大小</option>
+              <option value="asymmetry" data-i18n="colorAsymmetry">往復の差</option>
+              <option value="origin" data-i18n="colorOrigin">出発地別</option>
+              <option value="destination" data-i18n="colorDestination">到着地別</option>
+            </select>
+            <div data-color-mode="single">
+              <label for="style-flow-color" class="panel-label panel-label--spaced" data-i18n="styleFlowColor">色</label>
+              <input id="style-flow-color" type="color" data-setting="flowColor">
+            </div>
+            <div data-color-mode="value">
+              <label for="style-scheme" class="panel-label panel-label--spaced" data-i18n="styleScheme">配色</label>
+              <select id="style-scheme" data-setting="colorScheme">
+                <option value="blues">Blues</option>
+                <option value="oranges">Oranges</option>
+                <option value="greens">Greens</option>
+                <option value="purples">Purples</option>
+                <option value="viridis">Viridis</option>
+                <option value="inferno">Inferno</option>
+              </select>
+            </div>
+            <label for="style-opacity" class="panel-label panel-label--spaced" data-i18n="styleOpacity">不透明度</label>
+            <div class="range-row"><input id="style-opacity" type="range" min="0.1" max="1" step="0.05" data-setting="flowOpacity"><output data-for="style-opacity"></output></div>
+          </div>
+          <div class="panel-section">
+            <label for="style-node-size" class="panel-label" data-i18n="styleNodeSize">地点の大きさ</label>
+            <select id="style-node-size" data-setting="nodeSizeBy">
+              <option value="none" data-i18n="nodeSizeNone">固定</option>
+              <option value="total" data-i18n="nodeSizeTotal">流入＋流出</option>
+              <option value="in" data-i18n="nodeSizeIn">流入</option>
+              <option value="out" data-i18n="nodeSizeOut">流出</option>
+            </select>
+            <label for="style-node-max" class="panel-label panel-label--spaced" data-i18n="styleNodeMax">地点の最大半径（px）</label>
+            <div class="range-row"><input id="style-node-max" type="range" min="2" max="40" step="1" data-setting="nodeMaxRadius"><output data-for="style-node-max"></output></div>
+            <label for="style-node-color" class="panel-label panel-label--spaced" data-i18n="styleNodeColor">地点の色</label>
+            <select id="style-node-color" data-setting="nodeColorMode">
+              <option value="net" data-i18n="nodeColorNet">純流入（流入超過・流出超過）</option>
+              <option value="single" data-i18n="nodeColorSingle">単色</option>
+            </select>
+          </div>
+          <div class="panel-section">
+            <label for="style-label-mode" class="panel-label" data-i18n="styleLabels">ラベル</label>
+            <select id="style-label-mode" data-setting="labelMode">
+              <option value="top" data-i18n="labelTop">上位の地点</option>
+              <option value="all" data-i18n="labelAll">すべて</option>
+              <option value="none" data-i18n="labelNone">なし</option>
+            </select>
+            <label for="style-label-top" class="panel-label panel-label--spaced" data-i18n="styleLabelTop">ラベルを付ける件数</label>
+            <input id="style-label-top" type="number" min="1" max="200" step="1" data-setting="labelTopN">
+          </div>
+        </section>
+
+        <section id="tab-annotate" class="sidebar-panel dvz-setting-sidebar__panel hidden" data-dvz-setting-panel>
+          <div class="panel-section">
+            <label for="annotate-title" class="panel-label" data-i18n="annotateTitle">タイトル</label>
+            <input id="annotate-title" type="text" data-annotate="annotateTitle" data-i18n="annotateTitlePlaceholder" placeholder="チャートタイトル">
+          </div>
+          <div class="panel-section">
+            <label for="annotate-source" class="panel-label" data-i18n="annotateSource">出典</label>
+            <input id="annotate-source" type="text" data-annotate="annotateSource" data-i18n="annotateSourcePlaceholder" placeholder="データソース名">
+            <label for="annotate-source-url" class="panel-label panel-label--spaced" data-i18n="annotateSourceUrl">出典URL</label>
+            <input id="annotate-source-url" type="url" data-annotate="annotateSourceUrl" placeholder="https://...">
+          </div>
+          <div class="panel-section">
+            <label for="annotate-unit" class="panel-label" data-i18n="annotateUnit">値の単位</label>
+            <input id="annotate-unit" type="text" data-annotate="valueUnit" data-i18n="annotateUnitPlaceholder" placeholder="例：人、千円">
+          </div>
+          <div class="panel-section">
+            <label for="legend-position" class="panel-label" data-i18n="annotateLegend">凡例</label>
+            <select id="legend-position" data-annotate="legendPosition">
+              <option value="bottom-right" data-i18n="legendBottomRight">右下</option>
+              <option value="bottom-left" data-i18n="legendBottomLeft">左下</option>
+              <option value="top-right" data-i18n="legendTopRight">右上</option>
+              <option value="top-left" data-i18n="legendTopLeft">左上</option>
+              <option value="none" data-i18n="legendNone">なし</option>
+            </select>
+          </div>
+          <div class="panel-section">
+            <button id="annotate-apply-btn" type="button" class="dvz-btn dvz-btn-primary" data-i18n="apply">適用</button>
+          </div>
+        </section>
+
+        <!-- Export: COMMON_TAB_VISUAL_CONTRACT -->
+        <section id="tab-export" class="sidebar-panel dvz-setting-sidebar__panel common-export-tab hidden" data-dvz-setting-panel>
+          <div class="panel-section common-tab-section export-actions">
+            <h3 class="common-panel-heading" data-i18n="exportImage">画像</h3>
+            <button id="export-svg-btn" type="button" class="dvz-btn common-export-button">
+              <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
+              SVG
+            </button>
+            <button id="export-png-btn" type="button" class="dvz-btn common-export-button">
+              <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
+              PNG (2x)
+            </button>
+          </div>
+          <div class="panel-section common-tab-section export-actions">
+            <h3 class="common-panel-heading" data-i18n="exportData">データ</h3>
+            <button id="export-csv-btn" type="button" class="dvz-btn common-export-button">
+              <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
+              CSV
+            </button>
+            <button id="export-json-btn" type="button" class="dvz-btn common-export-button">
+              <svg aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
+              JSON
+            </button>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </div>
+
+  <div id="tooltip" class="dvz-tooltip" role="status" aria-live="polite"></div>
+
+  <script src="https://id.data-viz-lectures.com/lib/dataviz-locale.v1.js"></script>
+  <script src="https://id.data-viz-lectures.com/lib/settings-compat.v1.js"></script>
+  <script src="https://id.data-viz-lectures.com/lib/dvz-editor-shell.v1.js"></script>
+  <script src="https://id.data-viz-lectures.com/lib/dvz-setting-sidebar.v1.js"></script>
+  <script src="js/settings-spec.js?v=1"></script>
+  <script src="js/flow-model.js?v=1"></script>
+  <script src="js/gazetteer.js?v=1"></script>
+  <script src="js/flow-geometry.js?v=1"></script>
+  <script src="js/dvz-helpers.js?v=1"></script>
+  <script src="js/basemap.js?v=1"></script>
+  <script src="js/flow-legend.js?v=1"></script>
+  <script src="js/flow-renderer.js?v=1"></script>
+  <script src="js/controls.js?v=1"></script>
+  <script src="js/flow-view.js?v=1"></script>
+  <script src="js/sample-catalog.js?v=1"></script>
+  <script src="js/core/runtime.js?v=1"></script>
+  <script src="js/app.js?v=1"></script>
+</body>
+</html>

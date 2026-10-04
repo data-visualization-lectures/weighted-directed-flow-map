@@ -1,0 +1,222 @@
+/* weighted-directed-flow-map: tool-specific styles on top of css/dvz-common.css */
+
+:root {
+  --dvz-control-select-width: 96px;
+}
+
+/* Single-chart template: no #chart-switcher, so pin each row explicitly. */
+#dvz-chart {
+  grid-template-rows: auto minmax(0, 1fr) auto auto !important;
+}
+#dvz-chart > #chart-title { grid-row: 1; }
+#dvz-chart > #chart-area { grid-row: 2; }
+#dvz-chart > #dvz-controls { grid-row: 3; }
+#dvz-chart > #chart-source { grid-row: 4; }
+
+#dvz-controls[hidden] {
+  display: none;
+}
+
+#dvz-controls .dvz-control[hidden] {
+  display: none;
+}
+
+.dvz-control-btn {
+  height: 30px;
+  min-width: 30px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 10px;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.dvz-control-btn--icon {
+  padding: 0;
+  font-size: 15px;
+}
+
+.dvz-control-btn:hover {
+  background: #f9fafb;
+}
+
+.dvz-control-select:disabled {
+  opacity: 0.5;
+}
+
+#chart-container {
+  cursor: grab;
+}
+
+#chart-container:active {
+  cursor: grabbing;
+}
+
+#chart-container svg.wdfm-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+
+.wdfm-node.is-focus {
+  stroke: #111827;
+  stroke-width: 2px;
+}
+
+.dvz-tooltip {
+  max-width: 320px;
+  white-space: normal;
+}
+
+.dvz-tooltip-muted {
+  color: #d1d5db;
+  font-size: 0.72rem;
+}
+
+/* Sidebar helpers */
+.panel-note {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.panel-note:empty {
+  display: none;
+}
+
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.range-row input[type="range"] {
+  flex: 1 1 auto;
+  accent-color: var(--dvz-accent);
+}
+
+.range-row output {
+  min-width: 36px;
+  color: #4b5563;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.inline-row {
+  display: flex;
+  gap: 8px;
+}
+
+.inline-row select {
+  flex: 1 1 auto;
+}
+
+.inline-row input[type="number"] {
+  flex: 0 0 96px;
+}
+
+.coord-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+.coord-grid .panel-label {
+  margin-top: 6px;
+}
+
+input[type="color"] {
+  width: 48px;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid #cfd6df;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.check-row[hidden],
+[data-basemap-only][hidden],
+[data-color-mode][hidden],
+[data-format][hidden] {
+  display: none;
+}
+
+.match-report {
+  color: #374151;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.match-summary {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.match-group-title {
+  margin: 10px 0 4px;
+  color: #b45309;
+  font-weight: 600;
+}
+
+.match-list {
+  max-height: 180px;
+  margin: 0;
+  padding-left: 18px;
+  overflow-y: auto;
+}
+
+.match-list li {
+  margin: 2px 0;
+}
+
+.match-list select {
+  width: auto;
+  margin-left: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+.data-preview-empty {
+  margin: 0;
+  padding: 8px;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+/* Stacked layout (sidebar under the chart): let the app area scroll so the
+   whole sidebar stays reachable; the chart keeps a fixed share of the height. */
+@media (max-width: 980px) {
+  .dvz-app {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #main-area {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  #dvz-chart {
+    height: min(72vh, 680px);
+    min-height: 420px;
+  }
+
+  #dvz-sidebar {
+    max-height: none;
+    min-height: 460px;
+  }
+}
+
+@media (max-width: 480px) {
+  #dvz-chart {
+    height: 64vh;
+    min-height: 360px;
+    padding-inline: 8px;
+  }
+}

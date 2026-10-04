@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>重み付き有向フローマップ | Weighted Directed Flow Map</title>
+<meta name="description" content="">
+<meta property="og:type" content="website">
+<meta property="og:title" content="">
+<meta property="og:description" content="">
+<meta property="og:image" content="">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="">
+<meta name="twitter:image" content="">
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="vendor/topojson-client.min.js"></script>
+<script>
+(function () {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://id.data-viz-lectures.com/lib/dvz-share-shell.v1.css';
+  link.onerror = () => {
+    const fallback = document.createElement('link');
+    fallback.rel = 'stylesheet';
+    fallback.href = 'css/dvz-share-shell.v1.css';
+    document.head.insertBefore(fallback, document.querySelector('link[href^="css/share.css"]'));
+  };
+  document.head.appendChild(link);
+})();
+</script>
+<noscript><link rel="stylesheet" href="css/dvz-share-shell.v1.css"></noscript>
+<link rel="stylesheet" href="css/share.css?v=1">
+</head>
+<body class="dvz-share-shell--document">
+<div class="dvz-app">
+  <div id="dvz-loading">Loading...</div>
+  <div id="dvz-error" style="display:none"></div>
+  <div id="dvz-content" style="display:none">
+    <h1 id="chart-title"></h1>
+    <div id="chart-source"></div>
+    <div id="chart-container"></div>
+    <div id="dvz-controls"></div>
+  </div>
+  <div class="dvz-cta">
+    <a id="dvz-cta-link" href="https://weighted-directed-flow-map.dataviz.jp/">自分もフローマップを作る</a>
+  </div>
+  <div class="dvz-site-links">
+    <a id="dvz-tool-link" href="https://www.dataviz.jp/weighted-directed-flow-map/">重み付き有向フローマップ</a>
+    <span>|</span>
+    <a href="https://www.dataviz.jp/">dataviz.jp</a>
+  </div>
+</div>
+<div id="tooltip" class="dvz-tooltip" role="status" aria-live="polite" style="display:none"></div>
+<script src="https://id.data-viz-lectures.com/lib/dataviz-locale.v1.js"></script>
+<script src="https://id.data-viz-lectures.com/lib/settings-compat.v1.js"></script>
+<script src="js/settings-spec.js?v=1"></script>
+<script src="js/flow-model.js?v=1"></script>
+<script src="js/gazetteer.js?v=1"></script>
+<script src="js/flow-geometry.js?v=1"></script>
+<script src="js/dvz-helpers.js?v=1"></script>
+<script src="js/basemap.js?v=1"></script>
+<script src="js/flow-legend.js?v=1"></script>
+<script src="js/flow-renderer.js?v=1"></script>
+<script src="js/controls.js?v=1"></script>
+<script src="js/flow-view.js?v=1"></script>
+<script src="js/core/runtime.js?v=1"></script>
+<script src="js/core/routing.js?v=1"></script>
+<script>
+(function () {
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('Failed to load: ' + src));
+      document.body.appendChild(s);
+    });
+  }
+  (async () => {
+    try {
+      await loadScript('https://id.data-viz-lectures.com/lib/dvz-share-shell.v1.js');
+    } catch (_error) {
+      await loadScript('js/dvz-share-shell.v1.js');
+    }
+    if (!window.DVZShareShell) await loadScript('js/dvz-share-shell.v1.js');
+    await loadScript('js/share-runtime.js?v=1');
+  })().catch((error) => {
+    console.error('[weighted-directed-flow-map] share libs load failed:', error);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+/* ============================================================
+   dataviz.jp — Editor shell base styles (v1)
+   ============================================================ */
+
+:root {
+  --dvz-control-select-width: 96px;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+/* Tool header — position:fixed + min-height to fill space while loading */
+dataviz-tool-header {
+  position: fixed;
+  top: 48px;
+  left: 0;
+  right: 0;
+  min-height: 56px;
+  background: rgb(40, 40, 40);
+  box-sizing: border-box;
+  z-index: 9999;
+}
+
+/* Core app layout */
+.dvz-app {
+  box-sizing: border-box;
+  min-height: 0;
+  height: calc(100vh - 104px) !important;
+  height: calc(100dvh - 104px) !important;
+  overflow: hidden;
+  background: #fff;
+}
+
+#main-area {
+  min-height: 0;
+  overflow: hidden !important;
+}
+
+#dvz-chart {
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  background: #fff;
+}
+
+#chart-area {
+  min-height: 0;
+  overflow: hidden;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+}
+
+#chart-area > #chart-container,
+#chart-area > #chartBlock,
+#chart-area > #wrapper {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0 !important;
+}
+
+#chart-area #wrapper,
+#chart-area #chart-container > svg,
+#chart-area #chartBlock > svg {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  display: block;
+}
+
+#chart-area #chart-container > canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+#chart-area .empty-state {
+  min-height: 0;
+  height: 100%;
+}
+
+#dvz-controls,
+#chart-source,
+#dvz-site-links {
+  flex-shrink: 0;
+}
+
+/* SVG wrapper */
+#wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+/* Tooltip */
+.dvz-tooltip {
+  position: fixed;
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 13px;
+  pointer-events: none;
+  z-index: 100;
+  max-width: 220px;
+  line-height: 1.5;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal */
+.dvz-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+}
+
+.dvz-modal-overlay.active {
+  display: flex;
+}
+
+.dvz-modal-inner {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.dvz-modal-inner h3 {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+}
+
+.dvz-share-field {
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.dvz-share-field label {
+  display: block;
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.dvz-modal-inner input[type="text"],
+.dvz-modal-inner textarea {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 0;
+  box-sizing: border-box;
+}
+
+.dvz-modal-inner textarea {
+  min-height: 84px;
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.dvz-modal-inner input:focus,
+.dvz-modal-inner textarea:focus {
+  outline: none;
+  border-color: #333;
+}
+
+.dvz-modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.dvz-modal-actions button {
+  padding: 8px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #fff;
+  min-height: 44px;
+  transition: background 0.15s;
+}
+
+.dvz-modal-actions button:hover {
+  background: #f0f0f0;
+}
+
+.dvz-modal-actions .dvz-btn-primary {
+  background: #e8f4e8;
+  border-color: #6a6;
+  color: #363;
+}
+
+.dvz-modal-actions .dvz-btn-primary:hover {
+  background: #d0e8d0;
+}
+
+.dvz-modal-actions .dvz-btn-dark {
+  background: #333;
+  color: #fff;
+  border-color: #333;
+}
+
+.dvz-modal-actions .dvz-btn-dark:hover {
+  background: #555;
+}
+
+/* Help tooltip */
+.dvz-help-tip {
+  position: relative;
+  cursor: help;
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 11px;
+  color: #999;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.dvz-help-tip .dvz-help-text {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 6px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-line;
+  width: 280px;
+  pointer-events: none;
+  z-index: 200;
+}
+
+.dvz-help-tip:hover .dvz-help-text {
+  display: block;
+}
+
+/* Legend overlay (DOM-based, works for both SVG and WebGL) */
+#dvz-legend {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10;
+  font-size: 11px;
+  line-height: 1.5;
+  max-height: 80%;
+  overflow-y: auto;
+}
+
+#dvz-legend:empty {
+  display: none;
+}
+
+#dvz-legend.top-right {
+  top: 16px;
+  right: 16px;
+}
+
+#dvz-legend.bottom-right {
+  bottom: 16px;
+  right: 16px;
+}
+
+#dvz-legend .dvz-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+#dvz-legend .dvz-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+#dvz-legend .dvz-legend-label {
+  color: #555;
+  white-space: nowrap;
+}
+
+/* Chart container — position:relative for legend overlay anchor */
+#chart-container {
+  position: relative;
+}
+
+/* End-user controls */
+#dvz-controls {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  max-height: 56px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  background: #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+#dvz-controls > * {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+#dvz-controls:empty {
+  display: none;
+}
+
+.dvz-controls-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dvz-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.dvz-control-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #4b5563;
+}
+
+.dvz-control-select {
+  width: var(--dvz-control-select-width);
+  min-width: var(--dvz-control-select-width);
+  max-width: var(--dvz-control-select-width);
+  height: 30px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 10px;
+  font-size: 12px;
+  color: #374151;
+}
+
+.dvz-control-range {
+  width: 110px;
+}
+
+.dvz-control-value {
+  min-width: 22px;
+  text-align: right;
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.dvz-control-btn {
+  height: 30px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.dvz-control-select:disabled,
+.dvz-control-range:disabled {
+  opacity: 0.5;
+}
+
+/* Dropzone */
+#dvz-dropzone.dragover {
+  border-color: #6a6;
+  background: #f0faf0;
+  color: #363;
+}
+
+/* Embed mode */
+.dvz-embed .dvz-toolbar {
+  display: none;
+}
+
+.dvz-embed .dvz-sidebar {
+  display: none;
+}
+
+.dvz-embed dataviz-tool-header {
+  display: none;
+}
+
+.dvz-embed .dvz-app {
+  margin-top: 0 !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  padding: 12px;
+}
+
+.dvz-embed #dvz-chart {
+  padding: 0;
+}

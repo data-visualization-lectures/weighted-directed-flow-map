@@ -1,0 +1,62 @@
+/* weighted-directed-flow-map share page on top of dvz-share-shell.v1.css */
+
+body.dvz-share-shell--document {
+  --dvz-share-chart-height: clamp(360px, 68vh, 820px);
+  --dvz-share-chart-padding: 0;
+}
+
+#chart-container {
+  position: relative;
+  height: var(--dvz-share-chart-height);
+  min-height: 320px;
+  overflow: hidden;
+  cursor: grab;
+}
+
+#chart-container:active {
+  cursor: grabbing;
+}
+
+body.dvz-share-shell--document #chart-container svg.wdfm-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+}
+
+#chart-source a {
+  color: #4b5563;
+}
+
+#dvz-controls .dvz-control[hidden] {
+  display: none;
+}
+
+.dvz-control-btn {
+  min-width: 30px;
+}
+
+.dvz-control-select:disabled {
+  opacity: 0.5;
+}
+
+.dvz-tooltip {
+  max-width: 320px;
+  white-space: normal;
+}
+
+.dvz-tooltip-muted {
+  color: #d1d5db;
+  font-size: 0.72rem;
+}
+
+.wdfm-node.is-focus {
+  stroke: #111827;
+  stroke-width: 2px;
+}
+
+html.dvz-embed body.dvz-share-shell--document #chart-container {
+  height: calc(100vh - 120px);
+  height: calc(100dvh - 120px);
+  min-height: 260px;
+}

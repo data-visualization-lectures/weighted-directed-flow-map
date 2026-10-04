@@ -1,0 +1,190 @@
+{
+ "1": {
+  "ja": "北海道",
+  "en": "Hokkai Do"
+ },
+ "2": {
+  "ja": "青森県",
+  "en": "Aomori Ken"
+ },
+ "3": {
+  "ja": "岩手県",
+  "en": "Iwate Ken"
+ },
+ "4": {
+  "ja": "宮城県",
+  "en": "Miyagi Ken"
+ },
+ "5": {
+  "ja": "秋田県",
+  "en": "Akita Ken"
+ },
+ "6": {
+  "ja": "山形県",
+  "en": "Yamagata Ken"
+ },
+ "7": {
+  "ja": "福島県",
+  "en": "Fukushima Ken"
+ },
+ "8": {
+  "ja": "茨城県",
+  "en": "Ibaraki Ken"
+ },
+ "9": {
+  "ja": "栃木県",
+  "en": "Tochigi Ken"
+ },
+ "10": {
+  "ja": "群馬県",
+  "en": "Gunma Ken"
+ },
+ "11": {
+  "ja": "埼玉県",
+  "en": "Saitama Ken"
+ },
+ "12": {
+  "ja": "千葉県",
+  "en": "Chiba Ken"
+ },
+ "13": {
+  "ja": "東京都",
+  "en": "Tokyo To"
+ },
+ "14": {
+  "ja": "神奈川県",
+  "en": "Kanagawa Ken"
+ },
+ "15": {
+  "ja": "新潟県",
+  "en": "Niigata Ken"
+ },
+ "16": {
+  "ja": "富山県",
+  "en": "Toyama Ken"
+ },
+ "17": {
+  "ja": "石川県",
+  "en": "Ishikawa Ken"
+ },
+ "18": {
+  "ja": "福井県",
+  "en": "Fukui Ken"
+ },
+ "19": {
+  "ja": "山梨県",
+  "en": "Yamanashi Ken"
+ },
+ "20": {
+  "ja": "長野県",
+  "en": "Nagano Ken"
+ },
+ "21": {
+  "ja": "岐阜県",
+  "en": "Gifu Ken"
+ },
+ "22": {
+  "ja": "静岡県",
+  "en": "Shizuoka Ken"
+ },
+ "23": {
+  "ja": "愛知県",
+  "en": "Aichi Ken"
+ },
+ "24": {
+  "ja": "三重県",
+  "en": "Mie Ken"
+ },
+ "25": {
+  "ja": "滋賀県",
+  "en": "Shiga Ken"
+ },
+ "26": {
+  "ja": "京都府",
+  "en": "Kyoto Fu"
+ },
+ "27": {
+  "ja": "大阪府",
+  "en": "Osaka Fu"
+ },
+ "28": {
+  "ja": "兵庫県",
+  "en": "Hyogo Ken"
+ },
+ "29": {
+  "ja": "奈良県",
+  "en": "Nara Ken"
+ },
+ "30": {
+  "ja": "和歌山県",
+  "en": "Wakayama Ken"
+ },
+ "31": {
+  "ja": "鳥取県",
+  "en": "Tottori Ken"
+ },
+ "32": {
+  "ja": "島根県",
+  "en": "Shimane Ken"
+ },
+ "33": {
+  "ja": "岡山県",
+  "en": "Okayama Ken"
+ },
+ "34": {
+  "ja": "広島県",
+  "en": "Hiroshima Ken"
+ },
+ "35": {
+  "ja": "山口県",
+  "en": "Yamaguchi Ken"
+ },
+ "36": {
+  "ja": "徳島県",
+  "en": "Tokushima Ken"
+ },
+ "37": {
+  "ja": "香川県",
+  "en": "Kagawa Ken"
+ },
+ "38": {
+  "ja": "愛媛県",
+  "en": "Ehime Ken"
+ },
+ "39": {
+  "ja": "高知県",
+  "en": "Kochi Ken"
+ },
+ "40": {
+  "ja": "福岡県",
+  "en": "Fukuoka Ken"
+ },
+ "41": {
+  "ja": "佐賀県",
+  "en": "Saga Ken"
+ },
+ "42": {
+  "ja": "長崎県",
+  "en": "Nagasaki Ken"
+ },
+ "43": {
+  "ja": "熊本県",
+  "en": "Kumamoto Ken"
+ },
+ "44": {
+  "ja": "大分県",
+  "en": "Oita Ken"
+ },
+ "45": {
+  "ja": "宮崎県",
+  "en": "Miyazaki Ken"
+ },
+ "46": {
+  "ja": "鹿児島県",
+  "en": "Kagoshima Ken"
+ },
+ "47": {
+  "ja": "沖縄県",
+  "en": "Okinawa Ken"
+ }
+}

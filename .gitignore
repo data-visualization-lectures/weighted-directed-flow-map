@@ -1,0 +1,7 @@
+.DS_Store
+node_modules
+_reference/
+.netlify/
+# Raw downloads for scripts/build-*.mjs (see scripts/sources/README.md)
+scripts/sources/*
+!scripts/sources/README.md
