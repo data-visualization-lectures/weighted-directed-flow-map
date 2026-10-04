@@ -335,9 +335,9 @@
         basemap: this.geo ? {
           sphere: proj.sphere,
           path: proj.path,
-          features: proj.insetFrame ? this.geo.mainland : (kind === 'world' ? this.geo.mainland : this.geo.features),
+          features: proj.mainFeatures || this.geo.features,
           borders: proj.insetFrame ? null : this.geo.borders,
-          okinawa: this.geo.okinawa,
+          insetFeatures: proj.insetFeatures,
           insetPath: proj.insetPath,
           insetFrame: proj.insetFrame,
         } : null,

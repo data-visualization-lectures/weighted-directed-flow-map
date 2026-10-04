@@ -197,11 +197,13 @@
       if (bm.borders) {
         g.append('path').attr('class', 'wdfm-borders').attr('d', bm.path(bm.borders)).attr('fill', 'none').call(stroke, LAND.stroke, 0.5);
       }
-      if (bm.insetFrame && bm.insetPath && bm.okinawa) {
+      if (bm.insetFrame && bm.insetPath && bm.insetFeatures) {
         const f = bm.insetFrame;
-        g.append('rect').attr('x', f.x).attr('y', f.y).attr('width', f.w).attr('height', f.h)
+        g.append('rect').attr('class', 'wdfm-inset-frame').attr('x', f.x).attr('y', f.y).attr('width', f.w).attr('height', f.h)
           .attr('fill', '#ffffff').call(stroke, '#9ca3af', 0.75);
-        g.append('path').attr('d', bm.insetPath(bm.okinawa)).attr('fill', LAND.fill).call(stroke, LAND.stroke, 0.5);
+        g.append('path').attr('class', 'wdfm-inset-land')
+          .attr('d', bm.insetPath({ type: 'FeatureCollection', features: bm.insetFeatures }))
+          .attr('fill', LAND.fill).call(stroke, LAND.stroke, 0.5);
       }
     }
 
