@@ -47,6 +47,9 @@
       centerLongitude: { type: 'number', default: 0, min: -180, max: 180 },
       extent: { type: 'enum', default: 'nodes', values: ['nodes', 'basemap'] },
       okinawaInset: { type: 'boolean', default: false },
+      // lanes: A->B and B->A as two arrows side by side.
+      // single: one ribbon per pair, each end as wide as the flow leaving that end.
+      pairLayout: { type: 'enum', default: 'lanes', values: ['lanes', 'single'] },
       flowShape: { type: 'enum', default: 'arrow', values: FLOW_SHAPES },
       curvature: { type: 'number', default: 0.2, min: 0, max: 0.6 },
       maxWidth: { type: 'number', default: 16, min: 1, max: 60 },
@@ -109,7 +112,7 @@
     internal: ['detectedFormat', 'detectedGazetteer'],
     'tab-style': [
       'basemap', 'projection', 'centerLongitudeMode', 'centerLongitude', 'extent', 'okinawaInset',
-      'flowShape', 'curvature', 'maxWidth', 'minWidth', 'widthScale', 'topN', 'keepPairs', 'minValue',
+      'pairLayout', 'flowShape', 'curvature', 'maxWidth', 'minWidth', 'widthScale', 'topN', 'keepPairs', 'minValue',
       'colorMode', 'flowColor', 'colorScheme', 'flowOpacity', 'nodeSizeBy', 'nodeMaxRadius',
       'nodeColorMode', 'labelMode', 'labelTopN',
     ],

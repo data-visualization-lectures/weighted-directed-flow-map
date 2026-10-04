@@ -116,3 +116,12 @@ test('inset frame avoids obstacles', () => {
   const frame = G.placeInsetFrame(800, 600, [[0, 0, 150, 100]]);
   assert.ok(!G.boxesOverlap([frame.x, frame.y, frame.x + frame.w, frame.y + frame.h], [0, 0, 150, 100]) || frame.w < 120);
 });
+
+test('pair ribbons: each end takes its own width and has no arrowhead', () => {
+  const r = G.flowOutline({ p0: [0, 0], p1: [300, 0], width: 20, widthEnd: 6, curvature: 0, rStart: 0, rEnd: 0, gap: 0, taperEnd: 1, arrow: 0, centerline: 0 });
+  assert.equal(r.status, 'ok');
+  assert.ok(Math.abs(r.samples[0].hw - 10) < 1e-6, 'start half-width 10');
+  assert.ok(Math.abs(r.samples[r.samples.length - 2].hw - 3) < 1e-6, 'end half-width 3');
+  const widened = G.flowOutline({ p0: [0, 0], p1: [300, 0], width: 4, widthEnd: 18, curvature: 0, rStart: 0, rEnd: 0, gap: 0, arrow: 0 });
+  assert.ok(widened.samples[widened.samples.length - 2].hw > widened.samples[0].hw, 'the end can be wider than the start');
+});

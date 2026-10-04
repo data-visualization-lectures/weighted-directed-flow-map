@@ -57,6 +57,11 @@
         maxW = Math.max(maxW, textWidth(spec.title));
         y += ROW;
       }
+      if (spec.note) {
+        addText(body, 0, y + 5, spec.note, { size: 10, fill: '#6b7280' });
+        maxW = Math.max(maxW, textWidth(spec.note) * (10 / 11));
+        y += ROW - 2;
+      }
       const sampleLen = 54;
       spec.widths.forEach((item) => {
         const h = Math.max(ROW, item.width + 6);

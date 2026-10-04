@@ -143,6 +143,7 @@ input[type="color"] {
 .check-row[hidden],
 [data-basemap-only][hidden],
 [data-color-mode][hidden],
+[data-pair-layout][hidden],
 [data-format][hidden] {
   display: none;
 }

@@ -54,8 +54,8 @@
     <link rel="stylesheet" href="lib/dvz-editor-shell.v1.css">
     <link rel="stylesheet" href="lib/dvz-setting-sidebar.v1.css">
   </noscript>
-  <link rel="stylesheet" href="css/dvz-common.css?v=2">
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <link rel="stylesheet" href="css/dvz-common.css?v=3">
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
   <dataviz-tool-header></dataviz-tool-header>
@@ -217,13 +217,20 @@
             <label class="check-row" data-basemap-only="japan"><input id="style-okinawa" type="checkbox" data-setting="okinawaInset"><span data-i18n="styleOkinawa">九州より南の島を左上に移す（枠付き）</span></label>
           </div>
           <div class="panel-section">
-            <label for="style-shape" class="panel-label" data-i18n="styleShape">向きの表現</label>
+            <label for="style-pair-layout" class="panel-label" data-i18n="stylePairLayout">往復の並べ方</label>
+            <select id="style-pair-layout" data-setting="pairLayout">
+              <option value="lanes" data-i18n="pairLanes">2本に分けて並べる（二車線）</option>
+              <option value="single" data-i18n="pairSingle">1本にまとめる（両端の太さ＝各方向の値）</option>
+            </select>
+            <p class="panel-note" data-pair-layout="single" data-i18n="pairSingleNote">往復がそろった2地点を1本で描きます。各端の太さは、その端から出ていく流れの値です。片方向だけの2地点は、下の「向きの表現」の形で描きます。</p>
+            <label for="style-shape" class="panel-label panel-label--spaced" data-i18n="styleShape">向きの表現</label>
             <select id="style-shape" data-setting="flowShape">
               <option value="arrow" data-i18n="shapeArrow">均一幅＋矢尻</option>
               <option value="tapered" data-i18n="shapeTapered">先細り</option>
               <option value="tapered-arrow" data-i18n="shapeTaperedArrow">先細り＋矢尻</option>
               <option value="tapered-centerline" data-i18n="shapeTaperedCenter">先細り＋中央矢印線</option>
             </select>
+            <p class="panel-note" data-i18n="shapeNote">どの形でも、太さはそのフローの値です。先細りは向きを示すための形です。</p>
             <label for="style-curvature" class="panel-label panel-label--spaced" data-i18n="styleCurvature">曲がり具合</label>
             <div class="range-row"><input id="style-curvature" type="range" min="0" max="0.6" step="0.02" data-setting="curvature"><output data-for="style-curvature"></output></div>
             <label for="style-max-width" class="panel-label panel-label--spaced" data-i18n="styleMaxWidth">最大の太さ（px）</label>
@@ -364,18 +371,18 @@
   <script src="https://id.data-viz-lectures.com/lib/settings-compat.v1.js"></script>
   <script src="https://id.data-viz-lectures.com/lib/dvz-editor-shell.v1.js"></script>
   <script src="https://id.data-viz-lectures.com/lib/dvz-setting-sidebar.v1.js"></script>
-  <script src="js/settings-spec.js?v=2"></script>
-  <script src="js/flow-model.js?v=2"></script>
-  <script src="js/gazetteer.js?v=2"></script>
-  <script src="js/flow-geometry.js?v=2"></script>
-  <script src="js/dvz-helpers.js?v=2"></script>
-  <script src="js/basemap.js?v=2"></script>
-  <script src="js/flow-legend.js?v=2"></script>
-  <script src="js/flow-renderer.js?v=2"></script>
-  <script src="js/controls.js?v=2"></script>
-  <script src="js/flow-view.js?v=2"></script>
-  <script src="js/sample-catalog.js?v=2"></script>
-  <script src="js/core/runtime.js?v=2"></script>
-  <script src="js/app.js?v=2"></script>
+  <script src="js/settings-spec.js?v=3"></script>
+  <script src="js/flow-model.js?v=3"></script>
+  <script src="js/gazetteer.js?v=3"></script>
+  <script src="js/flow-geometry.js?v=3"></script>
+  <script src="js/dvz-helpers.js?v=3"></script>
+  <script src="js/basemap.js?v=3"></script>
+  <script src="js/flow-legend.js?v=3"></script>
+  <script src="js/flow-renderer.js?v=3"></script>
+  <script src="js/controls.js?v=3"></script>
+  <script src="js/flow-view.js?v=3"></script>
+  <script src="js/sample-catalog.js?v=3"></script>
+  <script src="js/core/runtime.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
 </body>
 </html>

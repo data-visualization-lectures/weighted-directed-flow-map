@@ -276,8 +276,46 @@
       const shape = GEO().shapeParams(s.flowShape);
       const flows = [];
       let shortCount = 0;
+      // pairLayout "single": a pair with both directions drawn becomes one ribbon.
+      // It starts at the origin of the larger flow; each end is as wide as the flow leaving it.
+      const singlePairs = s.pairLayout === 'single' && v.flowMode === 'gross';
+      const pairDone = new Set();
+      const byKey = new Map(v.flows.map((f) => [`${f.from}\u0000${f.to}`, f]));
       v.flows.forEach((f) => {
         if (!placed.has(f.from) || !placed.has(f.to)) return;
+        if (singlePairs && f.partnerDrawn) {
+          const key = [f.from, f.to].sort().join('\u0001');
+          if (pairDone.has(key)) return;
+          pairDone.add(key);
+          const back = byKey.get(`${f.to}\u0000${f.from}`);
+          const big = !back || f.value >= back.value ? f : back;
+          const small = big === f ? back : f;
+          const pair = {
+            ...big,
+            id: `${big.from}\u2194${big.to}`,
+            pair: true,
+            value: big.value,
+            forward: big.value,
+            reverseValue: small ? small.value : 0,
+            partnerDrawn: false,
+          };
+          flows.push({
+            ...pair,
+            color: s.colorMode === 'single' ? s.flowColor : this.flowColor(pair, rank),
+            opacity: s.flowOpacity,
+            params: {
+              width: this.widthFor(big.value),
+              widthEnd: this.widthFor(small ? small.value : 0),
+              curvature: s.curvature,
+              offset: 0,
+              halfInner: false,
+              taperEnd: 1,
+              arrow: 0,
+              centerline: 0,
+            },
+          });
+          return;
+        }
         const w = this.widthFor(f.value);
         const half = v.flowMode === 'gross' && f.partnerDrawn;
         flows.push({
@@ -310,6 +348,7 @@
         ? GEO().longWayCount(flows.map((f) => ({ lon0: byId.get(f.from).data.lon, lon1: byId.get(f.to).data.lon })), proj.center)
         : 0;
       this.stats = { shortCount, unprojected, longWay, drawn: flows.length, hiddenByTopN: v.hiddenByTopN };
+      this.sceneFlows = new Map(flows.map((f) => [f.id, f]));
 
       let message = '';
       if (!this.rows.length) message = '';
@@ -358,9 +397,11 @@
       const values = [...new Set([niceRound(vmax), niceRound(vmax / 2), niceRound(vmax / 5)].filter((x) => x > 0))];
       const unitLabel = unit ? txt(lang, `（${unit}）`, ` (${unit})`) : '';
       const title = v.flowMode === 'net' ? txt(lang, `純量${unitLabel}`, `Net flow${unitLabel}`) : txt(lang, `値${unitLabel}`, `Value${unitLabel}`);
+      const hasPairs = flows.some((f) => f.pair);
       const spec = {
         position: s.legendPosition,
         title,
+        note: hasPairs ? txt(lang, '往復は1本：両端の太さ＝その端から出る値', 'Two-way pairs: each end = flow leaving it') : '',
         shape: s.flowShape,
         sampleColor: s.colorMode === 'single' ? s.flowColor : '#6b7280',
         widths: values.map((x) => ({ label: H().formatCompact(x), width: this.widthFor(x) })),
@@ -473,10 +514,21 @@
         ]);
         return;
       }
-      const f = this.view.flows.find((x) => x.id === hit.id);
+      const f = this.sceneFlows?.get(hit.id) || this.view.flows.find((x) => x.id === hit.id);
       if (!f) return;
       const a = this.nodeLabel(f.from);
       const b = this.nodeLabel(f.to);
+      if (f.pair) {
+        const diff = f.forward - f.reverseValue;
+        H().showTooltip(event, [
+          { text: `${a} ⇄ ${b}`, strong: true },
+          { text: `${a} → ${b}: ${fmt(f.forward)}` },
+          { text: `${b} → ${a}: ${fmt(f.reverseValue)}` },
+          { text: `${txt(lang, '差', 'Difference')}: ${H().withUnit(`+${H().formatNumber(diff)}`, unit)}` },
+          { text: txt(lang, '両端の太さ＝その端から出ていく流れの値', 'Each end is as wide as the flow leaving it'), muted: true },
+        ]);
+        return;
+      }
       const lines = [{ text: `${a} → ${b}`, strong: true }];
       if (this.view.flowMode === 'net') {
         lines.push({ text: `${txt(lang, '純量', 'Net')}: ${fmt(f.value)}` });

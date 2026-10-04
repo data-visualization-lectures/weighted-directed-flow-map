@@ -7,7 +7,7 @@
   const Catalog = () => root.FlowSampleCatalog;
 
   const ANNOTATE_KEYS = ['annotateTitle', 'annotateSource', 'annotateSourceUrl', 'valueUnit', 'legendPosition'];
-  const STYLE_ANIMATED = new Set(['flowShape', 'curvature', 'maxWidth', 'minWidth', 'widthScale', 'topN', 'keepPairs', 'minValue', 'nodeSizeBy', 'nodeMaxRadius']);
+  const STYLE_ANIMATED = new Set(['pairLayout', 'flowShape', 'curvature', 'maxWidth', 'minWidth', 'widthScale', 'topN', 'keepPairs', 'minValue', 'nodeSizeBy', 'nodeMaxRadius']);
 
   function rowsToPayload(rows) {
     const columns = Array.isArray(rows?.columns) ? rows.columns.slice() : (rows?.[0] ? Object.keys(rows[0]) : []);
@@ -626,6 +626,9 @@
       });
       document.querySelectorAll('#tab-style [data-color-mode]').forEach((el) => {
         el.hidden = el.getAttribute('data-color-mode') !== s.colorMode;
+      });
+      document.querySelectorAll('#tab-style [data-pair-layout]').forEach((el) => {
+        el.hidden = el.getAttribute('data-pair-layout') !== s.pairLayout;
       });
       const center = document.getElementById('style-center');
       if (center) {

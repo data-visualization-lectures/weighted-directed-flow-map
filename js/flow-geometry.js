@@ -143,7 +143,7 @@
 
   /**
    * Builds the outline of one flow as a single closed path.
-   * o: { p0, p1, width, curvature, offset, rStart, rEnd, gap, halfInner,
+   * o: { p0, p1, width, widthEnd, curvature, offset, rStart, rEnd, gap, halfInner,
    *      taperEnd, arrow, centerline, density }
    * Returns { status: 'ok'|'short'|'degenerate', d, centerD, arrowD, tip, length, samples, bbox, ringSize }
    */
@@ -155,10 +155,13 @@
     const w = Math.max(0, Number(o.width) || 0);
     const gap = o.gap == null ? GAP : o.gap;
     const taperEnd = o.taperEnd == null ? 1 : clamp(o.taperEnd, 0, 1);
+    // Pair ribbons (both directions in one shape) give each end its own width.
+    const widthEnd = Number.isFinite(o.widthEnd) ? Math.max(0, o.widthEnd) : null;
     const arrow = o.arrow == null ? 1 : clamp(o.arrow, 0, 1);
     const centerline = o.centerline == null ? 0 : clamp(o.centerline, 0, 1);
     const density = o.density || 1;
-    const poly = controlPolygon({ p0, p1, curvature: Math.max(0, o.curvature || 0), offset: o.offset || 0, width: w });
+    const wMax = widthEnd == null ? w : Math.max(w, widthEnd);
+    const poly = controlPolygon({ p0, p1, curvature: Math.max(0, o.curvature || 0), offset: o.offset || 0, width: wMax });
     const { a, b, c } = poly;
     const lut = buildLut(a, c, b, Math.round(clamp(L / 6, 8, 64) * density) || 8);
 
@@ -168,7 +171,7 @@
     let sE = trimByDistance(lut, p1, (o.rEnd || 0) + gap + laneExtra, false);
     // Neighbouring places with wide flows (e.g. 東京↔神奈川) leave almost nothing after
     // trimming; let such flows run under the node discs instead (nodes are drawn on top).
-    if (sE - sS < Math.max(MIN_FLOW, 1.5 * w)) {
+    if (sE - sS < Math.max(MIN_FLOW, 1.5 * wMax)) {
       sS = trimByDistance(lut, p0, gap + laneExtra, true);
       sE = trimByDistance(lut, p1, gap + laneExtra, false);
       if (sE - sS < MIN_FLOW) return { status: 'short' };
@@ -200,7 +203,7 @@
       const D = quadDeriv(a, c, b, t);
       const len = Math.hypot(D[0], D[1]) || 1;
       const N = [D[1] / len, -D[0] / len];
-      const wb = w * (1 - (1 - taperEnd) * u);
+      const wb = widthEnd == null ? w * (1 - (1 - taperEnd) * u) : w + (widthEnd - w) * u;
       left.push([P[0] + (N[0] * wb) / 2, P[1] + (N[1] * wb) / 2]);
       right.push([P[0] - (N[0] * wb) / 2, P[1] - (N[1] * wb) / 2]);
       samples.push({ x: P[0], y: P[1], hw: wb / 2 });
@@ -284,7 +287,7 @@
   // Interpolates outline parameters for 1 s tweens.
   function lerpParams(from, to, t) {
     const out = { ...to };
-    ['width', 'curvature', 'offset', 'rStart', 'rEnd', 'taperEnd', 'arrow', 'centerline'].forEach((key) => {
+    ['width', 'widthEnd', 'curvature', 'offset', 'rStart', 'rEnd', 'taperEnd', 'arrow', 'centerline'].forEach((key) => {
       const fa = Number(from[key]);
       const tb = Number(to[key]);
       if (Number.isFinite(fa) && Number.isFinite(tb)) out[key] = lerp(fa, tb, t);

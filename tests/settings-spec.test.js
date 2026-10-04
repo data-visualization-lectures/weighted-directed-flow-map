@@ -54,3 +54,8 @@ test('sanitizeSettings fixes cross-field and type problems', () => {
   assert.deepEqual(s.nodeOverrides, { a: 'jp:13' });
   assert.equal(s.fromColumn, null);
 });
+
+test('pair layout defaults to two lanes', () => {
+  assert.equal(S.defaultSettings().pairLayout, 'lanes');
+  assert.deepEqual(S.SETTINGS_SPEC.fields.pairLayout.values, ['lanes', 'single']);
+});
