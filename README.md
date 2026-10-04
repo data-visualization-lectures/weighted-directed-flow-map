@@ -92,7 +92,7 @@ python3 -m http.server 8931
 - `js/flow-model.js`: 形式判定、列の自動割り当て、集計、総量／純量、上位件数（DOM 非依存）
 - `js/gazetteer.js`: 地名辞書の照合（DOM 非依存）
 - `js/flow-geometry.js`: フローの輪郭、二車線、矢尻、中心経度の自動選択、ラベル配置（DOM 非依存）
-- `js/basemap.js`: 基図の読込と投影、沖縄の移動
+- `js/basemap.js`: ベースマップの読込と投影、沖縄の移動
 - `js/flow-renderer.js`、`js/flow-legend.js`: SVG 描画、ズーム、凡例
 - `js/controls.js`: `#dvz-controls`
 - `js/flow-view.js`: 編集画面と共有ページで共通の描画制御
@@ -100,7 +100,7 @@ python3 -m http.server 8931
 - `js/share-runtime.js`、`js/core/routing.js`: 共有ページ
 - `lib/`、`js/dvz-share-shell.v1.js`、`css/dvz-share-shell.v1.css`: 共有ライブラリが読めないときのローカル fallback
 - `css/dvz-common.css`: Data / Export タブの視覚契約の基準（parallel-sets からコピー）
-- `scripts/`: 地名辞書・基図・サンプルの生成スクリプト（手動実行）
+- `scripts/`: 地名辞書・ベースマップ・サンプルの生成スクリプト（手動実行）
 - `supabase/`: シェアテーブルの migration と publish 関数
 
 ## データの出典とライセンス

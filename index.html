@@ -183,7 +183,7 @@
 
         <section id="tab-style" class="sidebar-panel dvz-setting-sidebar__panel hidden" data-dvz-setting-panel>
           <div class="panel-section">
-            <label for="style-basemap" class="panel-label" data-i18n="styleBasemap">基図</label>
+            <label for="style-basemap" class="panel-label" data-i18n="styleBasemap">ベースマップ</label>
             <select id="style-basemap" data-setting="basemap">
               <option value="auto" data-i18n="basemapAuto">自動</option>
               <option value="world" data-i18n="basemapWorld">世界</option>
@@ -193,10 +193,10 @@
             <label for="style-projection" class="panel-label panel-label--spaced" data-i18n="styleProjection">投影法</label>
             <select id="style-projection" data-setting="projection">
               <option value="auto" data-i18n="projAuto">自動</option>
-              <option value="natural-earth">Natural Earth</option>
-              <option value="equal-earth">Equal Earth</option>
-              <option value="mercator" data-i18n="projMercator">メルカトル</option>
-              <option value="conic-conformal" data-i18n="projConic">正角円錐</option>
+              <option value="natural-earth" data-i18n="projNaturalEarth">ナチュラルアース図法</option>
+              <option value="equal-earth" data-i18n="projEqualEarth">イコールアース図法</option>
+              <option value="mercator" data-i18n="projMercator">メルカトル図法</option>
+              <option value="conic-conformal" data-i18n="projConic">ランベルト正角円錐図法</option>
             </select>
             <div data-basemap-only="world">
               <label for="style-center-mode" class="panel-label panel-label--spaced" data-i18n="styleCenter">中心経度</label>
@@ -212,7 +212,7 @@
             <label for="style-extent" class="panel-label panel-label--spaced" data-i18n="styleExtent">表示範囲</label>
             <select id="style-extent" data-setting="extent">
               <option value="nodes" data-i18n="extentNodes">地点に合わせる</option>
-              <option value="basemap" data-i18n="extentBasemap">基図全体</option>
+              <option value="basemap" data-i18n="extentBasemap">ベースマップ全体</option>
             </select>
             <label class="check-row" data-basemap-only="japan"><input id="style-okinawa" type="checkbox" data-setting="okinawaInset"><span data-i18n="styleOkinawa">沖縄を左上に移す（枠付き）</span></label>
           </div>

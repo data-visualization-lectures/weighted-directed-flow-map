@@ -323,7 +323,7 @@
           ? txt(lang, 'この地点・方向のフローはありません', 'No flows for this place and direction')
           : txt(lang, '表示できるフローがありません（値がすべて0、または最小値・件数の条件で除外）', 'No flows to show (all zero, or filtered by minimum value / count)');
       }
-      if (this.geoError) message = [message, txt(lang, '基図を読み込めませんでした', 'Could not load the basemap')].filter(Boolean).join('\n');
+      if (this.geoError) message = [message, txt(lang, 'ベースマップを読み込めませんでした', 'Could not load the basemap')].filter(Boolean).join('\n');
 
       const unit = s.valueUnit || '';
       const legend = this.buildLegend(flows, rank, shape, unit);
