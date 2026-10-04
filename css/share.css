@@ -60,3 +60,11 @@ html.dvz-embed body.dvz-share-shell--document #chart-container {
   height: calc(100dvh - 120px);
   min-height: 260px;
 }
+
+.dvz-control-group {
+  gap: 4px;
+}
+
+.dvz-control-group .dvz-control-label {
+  margin-right: 2px;
+}

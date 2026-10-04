@@ -7,11 +7,11 @@
   const TEXT = {
     ja: {
       place: '地点', all: 'すべて', direction: '方向', both: '両方', out: '流出', in: '流入',
-      mode: '表示', gross: '総量', net: '純量', allGroups: 'すべて合計', zoomIn: '拡大', zoomOut: '縮小', reset: 'リセット',
+      mode: '表示', gross: '総量', net: '純量', allGroups: 'すべて合計', map: '地図', zoomIn: '拡大', zoomOut: '縮小', reset: 'リセット',
     },
     en: {
       place: 'Place', all: 'All', direction: 'Direction', both: 'Both', out: 'Out', in: 'In',
-      mode: 'View', gross: 'Gross', net: 'Net', allGroups: 'All (sum)', zoomIn: 'Zoom in', zoomOut: 'Zoom out', reset: 'Reset',
+      mode: 'View', gross: 'Gross', net: 'Net', allGroups: 'All (sum)', map: 'Map', zoomIn: 'Zoom in', zoomOut: 'Zoom out', reset: 'Reset',
     },
   };
 
@@ -68,9 +68,13 @@
       this.zoomOut = el('button', { type: 'button', className: 'dvz-control-btn dvz-control-btn--icon', 'aria-label': tx.zoomOut, title: tx.zoomOut }, '−');
       this.reset = el('button', { type: 'button', className: 'dvz-control-btn', id: 'ctl-reset' }, tx.reset);
       this.reset.style.visibility = 'hidden';
-      row.appendChild(this.zoomIn);
-      row.appendChild(this.zoomOut);
-      row.appendChild(this.reset);
+      // ＋ / − / リセット share one labelled group (reset also clears the place focus).
+      const mapGroup = el('div', { className: 'dvz-control dvz-control-group', role: 'group', 'aria-label': tx.map });
+      mapGroup.appendChild(el('span', { className: 'dvz-control-label', 'aria-hidden': 'true' }, tx.map));
+      mapGroup.appendChild(this.zoomIn);
+      mapGroup.appendChild(this.zoomOut);
+      mapGroup.appendChild(this.reset);
+      row.appendChild(mapGroup);
       this.container.replaceChildren(row);
 
       this.focus.addEventListener('change', () => this.handlers.onChange?.('focusNode', this.focus.value || null));

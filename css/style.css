@@ -221,3 +221,11 @@ input[type="color"] {
     padding-inline: 8px;
   }
 }
+
+.dvz-control-group {
+  gap: 4px;
+}
+
+.dvz-control-group .dvz-control-label {
+  margin-right: 2px;
+}

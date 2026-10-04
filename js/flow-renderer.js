@@ -7,6 +7,7 @@
 
   const G = () => root.FlowGeometry;
   const DURATION = 1000;
+  const ZOOM_DURATION = 750;
   const HEAVY_FLOWS = 600;
   const LABEL_FONT = '600 12px "Noto Sans JP", system-ui, sans-serif';
   const LAND = { fill: '#f3f4f6', stroke: '#d1d5db' };
@@ -113,16 +114,44 @@
       return Math.abs(t.k - 1) > 1e-3 || Math.abs(t.x) > 0.5 || Math.abs(t.y) > 0.5;
     }
 
-    zoomBy(factor) {
+    // Button zoom eases to the target. Repeated clicks build on the pending target,
+    // so three quick clicks still end at 1.5^3.
+    animateZoomTo(target) {
       if (!this.svg) return;
-      this.svg.call(this.zoom.scaleBy, factor);
-      this.opts.onZoom?.(this.isZoomed());
+      const constrained = this.zoom.constrain()(
+        target,
+        [[0, 0], [this.scene.width, this.scene.height]],
+        this.zoom.translateExtent(),
+      );
+      if (prefersReducedMotion()) {
+        this.svg.call(this.zoom.transform, constrained);
+        return;
+      }
+      this.zoomTarget = constrained;
+      // Unnamed on purpose: d3.zoom interrupts the unnamed transition when a drag or pinch starts.
+      this.svg.interrupt()
+        .transition()
+        .duration(ZOOM_DURATION)
+        .ease(d3.easeCubicInOut)
+        .call(this.zoom.transform, constrained)
+        .on('end interrupt', () => {
+          if (this.zoomTarget === constrained) this.zoomTarget = null;
+        });
+    }
+
+    zoomBy(factor) {
+      if (!this.svg || !this.scene) return;
+      const [k0, k1] = this.zoom.scaleExtent();
+      const from = this.zoomTarget || this.transform;
+      const center = [this.scene.width / 2, this.scene.height / 2];
+      const p = from.invert(center);
+      const k = Math.max(k0, Math.min(k1, from.k * factor));
+      this.animateZoomTo(d3.zoomIdentity.translate(center[0] - p[0] * k, center[1] - p[1] * k).scale(k));
     }
 
     resetZoom() {
-      if (!this.svg) return;
-      this.svg.call(this.zoom.transform, d3.zoomIdentity);
-      this.opts.onZoom?.(false);
+      if (!this.svg || !this.scene) return;
+      this.animateZoomTo(d3.zoomIdentity);
     }
 
     // Screen position of a node under the current zoom.
@@ -298,6 +327,11 @@
       }).filter(Boolean);
       const obstacles = this.legendBox ? [this.legendBox] : [];
       const placed = G().placeLabels(items, measureLabel, [2, 2, this.scene.width - 2, this.scene.height - 2], obstacles);
+      placed.forEach((d) => {
+        const [nx, ny] = this.pos(this.scene.nodeById.get(d.id));
+        d.dx = d.x - nx;
+        d.dy = d.y - ny;
+      });
       const texts = g.selectAll('text').data(placed).enter().append('text')
         .attr('x', (d) => d.x)
         .attr('y', (d) => d.y)
@@ -380,7 +414,14 @@
         this.drawLabels();
         this.buildHitIndex();
       } else {
-        this.gLabels.selectAll('text').remove();
+        // Labels ride along with their nodes; placement is redone when the zoom settles.
+        const nodeById = this.scene.nodeById;
+        this.gLabels.selectAll('text').each(function moveLabel(d) {
+          const n = nodeById.get(d.id);
+          if (!n) return;
+          const [x, y] = t.apply([n.x, n.y]);
+          d3.select(this).attr('x', x + d.dx).attr('y', y + d.dy);
+        });
       }
     }
 
