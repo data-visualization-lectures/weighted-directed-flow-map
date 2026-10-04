@@ -126,9 +126,9 @@ python3 -m http.server 8931
 
 ## デプロイ
 
-Netlify プロジェクト `weighted-directed-flow-map` が GitHub `data-visualization-lectures/weighted-directed-flow-map` の `main` を公開する構成です。build step はありません。`netlify.toml` の publish は `.` です。
+Netlify プロジェクト `weighted-directed-flow-map`（チーム n1n9-jp、site id `49785337-3a5e-4cc6-acb4-87e0b9c60bdf`）が GitHub `data-visualization-lectures/weighted-directed-flow-map` の `main` を公開する構成です。build step はありません。`netlify.toml` の publish は `.` です。
 
-カスタムドメインは DNS で次の CNAME を向けます。
+カスタムドメインは DNS で次の CNAME を向けます。`dataviz.jp` の DNS は Squarespace（旧 Google Domains）で管理しています。
 
 ```
 weighted-directed-flow-map.dataviz.jp  CNAME  weighted-directed-flow-map.netlify.app.
