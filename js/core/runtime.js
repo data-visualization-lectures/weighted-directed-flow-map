@@ -208,7 +208,8 @@
       if (this.dataSource !== 'project') {
         this.currentProjectId = null;
         this.currentProjectName = null;
-        this.header?.setProjectContext?.({ sourceType: this.dataSource, canOverwrite: false, sourceName: this.dataName });
+        const sourceType = { sample: 'sample', upload: 'import', data_url: 'external-url' }[this.dataSource] || 'import';
+        this.header?.setProjectContext?.({ sourceType, canOverwrite: false, sourceName: this.dataName });
       }
       this.view.setRows(this.rows);
       await this.view.update(this.settings, { animate: false });
@@ -279,9 +280,36 @@
           },
         });
         const projectId = new URLSearchParams(location.search).get('projectId');
-        if (projectId && header.loadProject) header.loadProject(projectId);
+        if (projectId) this.restoreProjectFromRoute(header, projectId);
       });
       window.addEventListener('resize', () => this.applyHeaderButtons());
+    }
+
+    // ?projectId= launch (e.g. from the app.dataviz.jp project list).
+    // header.loadProject() returns the saved data and does NOT call onProjectLoad,
+    // so the restore is done here with the returned data.
+    async restoreProjectFromRoute(header, projectId) {
+      if (this.routeProjectLoadStarted) return;
+      this.routeProjectLoadStarted = true;
+      if (typeof header?.loadProject !== 'function') {
+        H().dvzShowToast(H().t('プロジェクトを読み込めませんでした', 'Could not load the project'), 'error');
+        return;
+      }
+      try {
+        const data = await header.loadProject(projectId);
+        if (!data) {
+          H().dvzShowToast(H().t('プロジェクトが見つかりません', 'Project not found'), 'error');
+          return;
+        }
+        const context = typeof header.getProjectContext === 'function' ? header.getProjectContext() : {};
+        await this.onProjectLoad(data, {
+          id: projectId,
+          name: context.projectName || null,
+          isGroupProject: context.sourceType === 'group-project',
+        });
+      } catch (error) {
+        console.error('[weighted-directed-flow-map] project route restore failed', error);
+      }
     }
 
     applyHeaderButtons() {
