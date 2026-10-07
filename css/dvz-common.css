@@ -326,6 +326,9 @@ body[data-dvz-tool-header="hidden"] dataviz-tool-header {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+#chart-source a:hover {
+  text-decoration: none;
+}
 
 #dvz-site-links {
   flex: 0 0 auto;

@@ -28,6 +28,13 @@ body.dvz-share-shell--document #chart-container svg.wdfm-svg {
 #dvz-content #chart-source a {
   color: #9ca3af;
 }
+#dvz-content #chart-source a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+#dvz-content #chart-source a:hover {
+  text-decoration: none;
+}
 
 #dvz-controls .dvz-control[hidden] {
   display: none;
