@@ -795,17 +795,18 @@
   function renderSource(el, source, sourceUrl) {
     if (!el) return;
     el.replaceChildren();
-    if (!source) return;
-    el.appendChild(document.createTextNode(H().t('出典：', 'Source: ')));
+    const sourceBody = String(source).replace(/^(?:出典[:：]|Source:)\s*/i, '');
+    if (!sourceBody) return;
+    el.appendChild(document.createTextNode(H().t('出典: ', 'Source: ')));
     if (sourceUrl && /^https?:\/\//i.test(sourceUrl)) {
       const link = document.createElement('a');
       link.href = sourceUrl;
       link.target = '_blank';
       link.rel = 'noopener';
-      link.textContent = source;
+      link.textContent = sourceBody;
       el.appendChild(link);
     } else {
-      el.appendChild(document.createTextNode(source));
+      el.appendChild(document.createTextNode(sourceBody));
     }
   }
 
