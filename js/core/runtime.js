@@ -453,9 +453,14 @@
         const handler = () => this.onSettingInput(input);
         input.addEventListener(input.type === 'range' ? 'input' : 'change', handler);
       });
-      document.getElementById('annotate-apply-btn')?.addEventListener('click', () => this.readAnnotations());
       document.querySelectorAll('#tab-annotate [data-annotate]').forEach((input) => {
-        input.addEventListener('change', () => this.readAnnotations());
+        const isText = input.tagName !== 'SELECT';
+        input.addEventListener(isText ? 'input' : 'change', () => {
+          const key = input.getAttribute('data-annotate');
+          this.settings = { ...this.settings, [key]: input.value || (isText ? '' : 'none') };
+          this.renderAnnotations();
+          if (!isText && this.rows.length) this.view.update(this.settings, { animate: false });
+        });
       });
       document.getElementById('export-svg-btn')?.addEventListener('click', () => this.exportImage('svg'));
       document.getElementById('export-png-btn')?.addEventListener('click', () => this.exportImage('png'));
