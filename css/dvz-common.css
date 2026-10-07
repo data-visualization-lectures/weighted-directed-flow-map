@@ -312,7 +312,7 @@ body[data-dvz-tool-header="hidden"] dataviz-tool-header {
 #chart-source {
   grid-row: 4;
   min-height: 1rem;
-  color: #8a94a3;
+  color: #9ca3af;
   font-size: 0.75rem;
   line-height: 1.35;
 }
@@ -322,7 +322,7 @@ body[data-dvz-tool-header="hidden"] dataviz-tool-header {
 }
 
 #chart-source a {
-  color: #4b5563;
+  color: #9ca3af;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
