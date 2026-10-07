@@ -24,7 +24,8 @@ body.dvz-share-shell--document #chart-container svg.wdfm-svg {
   user-select: none;
 }
 
-#chart-source a {
+#dvz-content #chart-source,
+#dvz-content #chart-source a {
   color: #9ca3af;
 }
 
